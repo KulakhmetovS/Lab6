@@ -5,15 +5,14 @@
 
 int** Creategraph(int **, int);
 
-int size;
-
 int **GraphUnion(int **, int**, int);
 int **GraphIntersection(int **, int**, int);
 int **GraphXOR(int **, int**, int);
+void PrintGraph(int **, int);
 
 int main()
 {
-    int i, j;
+    int i, j, size;
     int **graph1 = NULL, **graph2 = NULL, **Graph = NULL;
 
     printf("\t# Graphs #\n\n");
@@ -43,39 +42,36 @@ int main()
 
     Graph = GraphUnion(graph1, graph2, size);
 
+    printf("Graphs union\n");
+    PrintGraph(Graph, size);
+
     for(i = 0; i < size; i++)
-    {
-        for(j = 0; j < size; j++)
-        {
-            printf("%d ", Graph[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+        free(Graph[i]);
+    free(Graph);
 
     Graph = GraphIntersection(graph1, graph2, size);
 
+    printf("Graphs intersection\n");
+    PrintGraph(Graph, size);
+
     for(i = 0; i < size; i++)
-    {
-        for(j = 0; j < size; j++)
-        {
-            printf("%d ", Graph[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+        free(Graph[i]);
+    free(Graph);
 
     Graph = GraphXOR(graph1, graph2, size);
 
-    for(i = 0; i < size; i++)
-    {
-        for(j = 0; j < size; j++)
-        {
-            printf("%d ", Graph[i][j]);
-        }
-        printf("\n");
-    }
+    printf("Ring sum of graphs\n");
+    PrintGraph(Graph, size);
 
+    for(i = 0; i < size; i++)
+        free(Graph[i]);
+    free(Graph);
+    for(i = 0; i < size; i++)
+        free(graph1[i]);
+    free(graph1);
+    for(i = 0; i < size; i++)
+        free(graph2[i]);
+    free(graph2);
     return 0;
 }
 
@@ -201,4 +197,17 @@ int **GraphXOR(int **graph1, int **graph2, int size)
             }
 
     return Graph;
+}
+
+void PrintGraph(int **Graph, int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        for(int j = 0; j < size; j++)
+        {
+            printf("%d ", Graph[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
