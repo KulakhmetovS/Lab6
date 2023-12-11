@@ -96,6 +96,14 @@ int main()
     printf("Enter the number of graph vertices (positive integer) whose edge need to be contracted: ");
     scanf("%d%d", &vertex1, &vertex2);
 
+    for(i = 0; i < size; i++)
+    {
+        if((graphClone[vertex1][i] == 1) && (i == vertex2)) goto contraction;
+    }
+    printf("edge does not exist\n");
+goto end;
+
+contraction:
     Graph = EdgeContraction(graphClone, size, vertex1, vertex2);
 
     for(i = 0; i < size - 1; i++)
@@ -106,6 +114,7 @@ int main()
     }
     printf("\n");
 
+end:
     printf("Enter the number of graph vertices (positive integer) you need split: ");
     scanf("%d", &vertex1);
     Graph = SplitVertex(graph, size, vertex1);
