@@ -5,45 +5,55 @@
 
 int** Creategraph(int **, int);
 
-int **GraphUnion(int **, int**, int);
+void GraphUnion(int **, int**, int, int);
 int **GraphIntersection(int **, int**, int);
 int **GraphXOR(int **, int**, int);
 void PrintGraph(int **, int);
 
 int main()
 {
-    int i, j, size;
+    int i, j, size1, size2;
     int **graph1 = NULL, **graph2 = NULL, **Graph = NULL;
 
     printf("\t# Graphs #\n\n");
-    printf("Enter the number of graph vertices (positive integer): ");
-    scanf("%d", &size);
+
 
     // Creating the graph
-    graph1 = Creategraph(graph1, size);
-    sleep(1);
-    graph2 = Creategraph(graph2, size);
+    printf("Enter the number of first graph vertices (positive integer): ");
+    scanf("%d", &size1);
+    graph1 = Creategraph(graph1, size1);
+
+    printf("Enter the number of second graph vertices (positive integer): ");
+    scanf("%d", &size2);
+    graph2 = Creategraph(graph2, size2);
 
     // Printing the matrix
-    for(i = 0; i < size; i++)
+    for(i = 0; i < size1; i++)
     {
-        for(j = 0; j < size; j++)
+        for(j = 0; j < size1; j++)
         {
             printf("%d ", graph1[i][j]);
         }
-        printf("   ");
-        for(j = 0; j < size; j++)
+        printf("\n");
+    }
+    printf("\n");
+    for(i = 0; i < size2; i++)
+    {
+        for(j = 0; j < size2; j++)
         {
             printf("%d ", graph2[i][j]);
         }
         printf("\n");
     }
-    printf("\n");
 
-    Graph = GraphUnion(graph1, graph2, size);
+    GraphUnion(graph1, graph2, size1, size2);
 
+    /*
     printf("Graphs union\n");
-    PrintGraph(Graph, size);
+
+    if(size1 > size2) PrintGraph(Graph, size1);
+    else PrintGraph(Graph, size2);
+
 
     for(i = 0; i < size; i++)
         free(Graph[i]);
@@ -63,8 +73,6 @@ int main()
     printf("Ring sum of graphs\n");
     PrintGraph(Graph, size);
 
-    for(i = 0; i < size; i++)
-        free(Graph[i]);
     free(Graph);
     for(i = 0; i < size; i++)
         free(graph1[i]);
@@ -72,6 +80,7 @@ int main()
     for(i = 0; i < size; i++)
         free(graph2[i]);
     free(graph2);
+    */
     return 0;
 }
 
@@ -100,23 +109,47 @@ int** Creategraph(int **graph, int size)
     return graph;
 }
 
-int **GraphUnion(int **graph1, int** graph2, int size)
+void GraphUnion(int **graph1, int** graph2, int size1, int size2)
 {
+    printf("\n# Graph union #");
+
     int **Graph = NULL;
-    int res, val1, val2;
+    int res, val1, val2, size_max, size_min;
 
-    Graph = (int **)(malloc(sizeof(int *) * size));
-    for(int i = 0; i < size; i++)
-        Graph[i] = (int *)(malloc(sizeof(int *) * size));
+    if(size1 > size2)
+    {
+        size_max = size1;
+        size_min = size2;
+    }
+    else
+    {
+        size_max = size2;
+        size_min = size1;
+    }
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
-            Graph[i][j] = graph2[i][j];
+    Graph = (int **)(malloc(sizeof(int *) * size_max));
+    for(int i = 0; i < size_max; i++)
+        Graph[i] = (int *)(malloc(sizeof(int *) * size_max));
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
+    if(size_max == size1)
+    {
+    for(int i = 0; i < size_max; i++)
+        for(int j = 0; j < size_max; j++)
+            Graph[i][j] = graph1[i][j];
+    }
+    else
+    {
+    for(int i = 0; i < size_max; i++)
+    for(int j = 0; j < size_max; j++)
+        Graph[i][j] = graph2[i][j];
+    }
+
+    for(int i = 0; i < size_min; i++)
+        for(int j = 0; j < size_min; j++)
             {
-                val1 = graph1[i][j];
+                if(size_max == size1) val1 = graph2[i][j];
+                else val1 = graph1[i][j];
+
                 val2 = Graph[i][j];
                 __asm(
                         "movl %[val2], %%eax\n\t"
@@ -130,7 +163,8 @@ int **GraphUnion(int **graph1, int** graph2, int size)
                 Graph[i][j] = res;
             }
 
-    return Graph;
+    printf("\n");
+    PrintGraph(Graph, size_max);
 }
 
 int **GraphIntersection(int **graph1, int**graph2, int size)
@@ -210,4 +244,7 @@ void PrintGraph(int **Graph, int size)
         printf("\n");
     }
     printf("\n");
+
+    for(int i = 0; i < size; i++)
+        free(Graph[i]);
 }
