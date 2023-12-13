@@ -6,14 +6,14 @@
 int** Creategraph(int **, int);
 
 void GraphUnion(int **, int**, int, int);
-int **GraphIntersection(int **, int**, int);
-int **GraphXOR(int **, int**, int);
+void GraphIntersection(int **, int**, int, int);
+void GraphXOR(int **, int**, int, int);
 void PrintGraph(int **, int);
 
 int main()
 {
     int i, j, size1, size2;
-    int **graph1 = NULL, **graph2 = NULL, **Graph = NULL;
+    int **graph1 = NULL, **graph2 = NULL;
 
     printf("\t# Graphs #\n\n");
 
@@ -48,39 +48,19 @@ int main()
 
     GraphUnion(graph1, graph2, size1, size2);
 
-    /*
-    printf("Graphs union\n");
+    GraphIntersection(graph1, graph2, size1, size2);
 
-    if(size1 > size2) PrintGraph(Graph, size1);
-    else PrintGraph(Graph, size2);
+    GraphXOR(graph1, graph2, size1, size2);
 
 
-    for(i = 0; i < size; i++)
-        free(Graph[i]);
-    free(Graph);
-
-    Graph = GraphIntersection(graph1, graph2, size);
-
-    printf("Graphs intersection\n");
-    PrintGraph(Graph, size);
-
-    for(i = 0; i < size; i++)
-        free(Graph[i]);
-    free(Graph);
-
-    Graph = GraphXOR(graph1, graph2, size);
-
-    printf("Ring sum of graphs\n");
-    PrintGraph(Graph, size);
-
-    free(Graph);
-    for(i = 0; i < size; i++)
+    for(i = 0; i < size1; i++)
         free(graph1[i]);
     free(graph1);
-    for(i = 0; i < size; i++)
+
+    for(i = 0; i < size2; i++)
         free(graph2[i]);
     free(graph2);
-    */
+
     return 0;
 }
 
@@ -167,23 +147,47 @@ void GraphUnion(int **graph1, int** graph2, int size1, int size2)
     PrintGraph(Graph, size_max);
 }
 
-int **GraphIntersection(int **graph1, int**graph2, int size)
+void GraphIntersection(int **graph1, int**graph2, int size1, int size2)
 {
+ printf("\n# Graph Intersection #");
+
     int **Graph = NULL;
-    int res, val1, val2;
+    int res, val1, val2, size_max, size_min;
 
-    Graph = (int **)(malloc(sizeof(int *) * size));
-    for(int i = 0; i < size; i++)
-        Graph[i] = (int *)(malloc(sizeof(int *) * size));
+    if(size1 > size2)
+    {
+        size_max = size1;
+        size_min = size2;
+    }
+    else
+    {
+        size_max = size2;
+        size_min = size1;
+    }
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
+    Graph = (int **)(malloc(sizeof(int *) * size_min));
+    for(int i = 0; i < size_min; i++)
+        Graph[i] = (int *)(malloc(sizeof(int *) * size_min));
+
+    if(size_min == size1)
+    {
+    for(int i = 0; i < size_min; i++)
+        for(int j = 0; j < size_min; j++)
+            Graph[i][j] = graph1[i][j];
+    }
+    else
+    {
+    for(int i = 0; i < size_min; i++)
+        for(int j = 0; j < size_min; j++)
             Graph[i][j] = graph2[i][j];
+    }
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
+    for(int i = 0; i < size_min; i++)
+        for(int j = 0; j < size_min; j++)
             {
-                val1 = graph1[i][j];
+                if(size_max == size2) val1 = graph2[i][j];
+                else val1 = graph1[i][j];
+
                 val2 = Graph[i][j];
                 __asm(
                         "movl %[val2], %%eax\n\t"
@@ -197,26 +201,51 @@ int **GraphIntersection(int **graph1, int**graph2, int size)
                 Graph[i][j] = res;
             }
 
-    return Graph;
+    printf("\n");
+    PrintGraph(Graph, size_min);
 }
 
-int **GraphXOR(int **graph1, int **graph2, int size)
+void GraphXOR(int **graph1, int **graph2, int size1, int size2)
 {
+   printf("\n# Ring sum of graphs #");
+
     int **Graph = NULL;
-    int res, val1, val2;
+    int res, val1, val2, size_max, size_min;
 
-    Graph = (int **)(malloc(sizeof(int *) * size));
-    for(int i = 0; i < size; i++)
-        Graph[i] = (int *)(malloc(sizeof(int *) * size));
+    if(size1 > size2)
+    {
+        size_max = size1;
+        size_min = size2;
+    }
+    else
+    {
+        size_max = size2;
+        size_min = size1;
+    }
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
-            Graph[i][j] = graph2[i][j];
+    Graph = (int **)(malloc(sizeof(int *) * size_max));
+    for(int i = 0; i < size_max; i++)
+        Graph[i] = (int *)(malloc(sizeof(int *) * size_max));
 
-    for(int i = 0; i < size; i++)
-        for(int j = 0; j < size; j++)
+    if(size_max == size1)
+    {
+    for(int i = 0; i < size_max; i++)
+        for(int j = 0; j < size_max; j++)
+            Graph[i][j] = graph1[i][j];
+    }
+    else
+    {
+    for(int i = 0; i < size_max; i++)
+    for(int j = 0; j < size_max; j++)
+        Graph[i][j] = graph2[i][j];
+    }
+
+    for(int i = 0; i < size_min; i++)
+        for(int j = 0; j < size_min; j++)
             {
-                val1 = graph1[i][j];
+                if(size_max == size1) val1 = graph2[i][j];
+                else val1 = graph1[i][j];
+
                 val2 = Graph[i][j];
                 __asm(
                         "movl %[val2], %%eax\n\t"
@@ -230,7 +259,8 @@ int **GraphXOR(int **graph1, int **graph2, int size)
                 Graph[i][j] = res;
             }
 
-    return Graph;
+    printf("\n");
+    PrintGraph(Graph, size_max);
 }
 
 void PrintGraph(int **Graph, int size)
